@@ -1,9 +1,11 @@
+// pages/api/auth/[...nextauth].js
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise from '@/lib/mongoClient'; // MongoDB connection
+import clientPromise from '@/lib/mongoClient';
+import { connectDB } from '@/lib/mongodb';
+import { User } from '@/models/userSchema';
 
-// Define auth options only once
 export const authOptions = {
   providers: [
     GoogleProvider({
@@ -13,18 +15,23 @@ export const authOptions = {
   ],
   adapter: MongoDBAdapter(clientPromise),
   session: {
-    strategy: 'jwt', // Use JWT for session management
+    strategy: 'jwt',
   },
   callbacks: {
     async session({ session, token }) {
-      session.user.id = token.sub; // Attach user ID from token
+      session.user.id = token.sub;
+
+      await connectDB();
+      const dbUser = await User.findOne({ email: session.user.email });
+      if (dbUser) {
+        session.user.isProfileComplete = dbUser.isProfileComplete;
+      }
+
       return session;
     },
   },
-  dynamic: 'force-dynamic', // Disable caching for fresh render
 };
 
-// Initialize NextAuth with the authOptions
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
