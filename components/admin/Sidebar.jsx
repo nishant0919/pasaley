@@ -1,93 +1,83 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import {
-  FaHome, FaStore, FaUsers, FaTags, FaBox,
-  FaUserAlt, FaShoppingCart, FaChartLine, FaCog
-} from 'react-icons/fa';
+import { usePathname } from 'next/navigation';
+import { FaHome, FaStore, FaUsers, FaTags, FaBox, FaUserAlt, FaShoppingCart, FaChartLine, FaCog, FaBars } from 'react-icons/fa';
 
-export default function AdminSidebar({ isOpen = true, onClose }) {
+export default function AdminSidebar() {
   const { data: session } = useSession();
+  const pathname = usePathname(); // Get the current route
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Controls sidebar visibility on mobile
+  const links = [
+    { href: '/admin/home', label: 'Home', icon: <FaHome /> },
+    { href: '/admin/users', label: 'Users', icon: <FaUsers /> },
+    { href: '/admin/categories', label: 'Categories', icon: <FaTags /> },
+    { href: '/admin/products', label: 'Products', icon: <FaBox /> },
+    { href: '/admin/customers', label: 'Customers', icon: <FaUserAlt /> },
+    { href: '/admin/orders', label: 'Orders', icon: <FaShoppingCart /> },
+    { href: '/admin/analytics', label: 'Analytics', icon: <FaChartLine /> },
+    { href: '/admin/customizations', label: 'Customizations', icon: <FaCog /> },
+  ];
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen); // Toggle sidebar on mobile
+  };
 
   return (
-    <aside className={`bg-gray-800 text-white p-6 w-[25vw] h-screen space-y-6 z-20 transition-transform
-      ${isOpen ? 'block' : 'hidden'} md:block fixed md:relative top-0 left-0 `}>
-      
-      <h2 className="text-2xl font-bold text-center mb-6">Admin Panel</h2>
+    <div className="flex">
+      {/* Hamburger Button for Mobile */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden p-4 text-white"
+      >
+        <FaBars />
+      </button>
 
-      {session?.user && (
-        <div className="flex items-center space-x-4 mb-6">
-          <img
-            src={session.user.image || '/default-profile.jpg'}
-            alt="User Avatar"
-            className="w-12 h-12 rounded-full"
-          />
-          <div>
-            <p className="font-semibold">{session.user.name}</p>
-            <p className="text-sm">{session.user.email}</p>
+      {/* Sidebar */}
+      <aside
+        className={`bg-gray-800 text-white p-6 h-screen fixed top-0 left-0 transition-all duration-300 
+          ${isSidebarOpen ? 'w-[20vw]' : 'w-16'} 
+          md:w-[20vw] md:block`}
+      >
+        {/* Sidebar Header */}
+        <h2 className="text-2xl font-bold text-center mb-6 md:hidden">{/* For mobile view */} Admin</h2>
+
+        {/* User Info */}
+        {session?.user && (
+          <div className="flex items-center space-x-4 mb-6">
+            <img
+              src={session.user.image || '/default-profile.jpg'}
+              alt="User Avatar"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <div className="hidden md:block">
+              <p className="font-semibold">{session.user.name}</p>
+              <p className="text-sm">{session.user.email}</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <hr className="border-gray-700" />
+        <hr className="border-gray-700 mb-4" />
 
-      <ul className="space-y-4 mt-4">
-        <li>
-          <Link href="/admin/home" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaHome />
-            <span>Home</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/store" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaStore />
-            <span>Store</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/users" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaUsers />
-            <span>Users</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/categories" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaTags />
-            <span>Categories</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/products" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaBox />
-            <span>Products</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/customers" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaUserAlt />
-            <span>Customers</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/orders" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaShoppingCart />
-            <span>Orders</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/analytics" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaChartLine />
-            <span>Analytics</span>
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/customizations" className="flex items-center space-x-3 hover:text-gray-400">
-            <FaCog />
-            <span>Customizations</span>
-          </Link>
-        </li>
-      </ul>
-    </aside>
+        {/* Sidebar Links */}
+        <ul className="space-y-2">
+          {links.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition 
+                  ${pathname === link.href ? 'bg-gray-700 font-bold' : 'hover:bg-gray-700'}`}
+              >
+                {link.icon}
+                <span className={`${isSidebarOpen ? 'block' : 'hidden'} md:block`}>{link.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
   );
 }
