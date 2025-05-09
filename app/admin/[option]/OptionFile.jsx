@@ -5,7 +5,7 @@ import { FaBars } from 'react-icons/fa';
 import AdminSidebar from '@/components/AdminSidebar';
 
 import Category from '@/components/Admin/Category';
-import Questions from '@/components/Admin/Questions';
+
 import Home from '@/components/Admin/Home';
 import Store from '@/components/Admin/Store';
 import Users from '@/components/Admin/Users';

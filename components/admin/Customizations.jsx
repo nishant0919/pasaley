@@ -54,8 +54,6 @@ export default function Customizations() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Sending settings:', storeSettings); // Log the payload
-
     const response = await fetch('/api/store/settings', {
       method: 'POST',
       headers: {
@@ -67,8 +65,7 @@ export default function Customizations() {
     if (response.ok) {
       alert('Settings saved successfully!');
     } else {
-      const errorData = await response.json();
-      alert(`Failed to save settings: ${errorData.message}`);
+      alert('Failed to save settings.');
     }
   };
 
