@@ -35,7 +35,6 @@ export default function AdminHome() {
       transition={{ duration: 0.8 }}
     >
 
-      {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-bold">Dashboard</h1>
@@ -48,7 +47,6 @@ export default function AdminHome() {
         />
       </div>
 
-      {/* Statistic Cards */}
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"
         initial={{ y: 20, opacity: 0 }}
@@ -61,7 +59,6 @@ export default function AdminHome() {
         <StatCard title="Orders" value="530" icon={<FaShoppingCart size={32} />} color="text-red-400" />
       </motion.div>
 
-      {/* Quick Links */}
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
         initial={{ y: 20, opacity: 0 }}
@@ -76,7 +73,6 @@ export default function AdminHome() {
         <QuickLink href="/admin/customizations" title="Settings" icon={<FaCog />} />
       </motion.div>
 
-      {/* Analytics */}
       <motion.div
         className="bg-gray-800 p-6 rounded-2xl shadow-lg"
         initial={{ y: 20, opacity: 0 }}
@@ -100,7 +96,6 @@ export default function AdminHome() {
           </div>
         </div>
 
-        {/* Line Chart */}
         <div className="bg-gray-700 rounded-xl p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-300">Revenue Growth</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -120,9 +115,6 @@ export default function AdminHome() {
   );
 }
 
-// ===== Sub Components =====
-
-// Single Stat Card
 function StatCard({ title, value, icon, color }) {
   return (
     <div className="bg-gray-800 p-6 rounded-2xl flex items-center justify-between hover:bg-gray-700 transition">
@@ -137,7 +129,6 @@ function StatCard({ title, value, icon, color }) {
   );
 }
 
-// Quick Link Card
 function QuickLink({ href, title, icon }) {
   return (
     <Link href={href} className="bg-gray-800 hover:bg-gray-700 p-6 rounded-2xl flex gap-4 items-center transition">
@@ -147,7 +138,6 @@ function QuickLink({ href, title, icon }) {
   );
 }
 
-// Dummy Revenue Data
 const chartData = [
   { name: 'Jan', revenue: 4000 },
   { name: 'Feb', revenue: 3000 },

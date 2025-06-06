@@ -1,4 +1,3 @@
-// app/api/category/route.js
 import { connectDB } from "@/lib/mongodb";
 import Category from "@/models/Category";
 

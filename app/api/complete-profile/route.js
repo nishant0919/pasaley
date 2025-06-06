@@ -1,4 +1,3 @@
-// app/api/complete-profile/route.js
 import { connectDB } from '@/lib/mongodb';
 import { User } from '@/models/userSchema';
 

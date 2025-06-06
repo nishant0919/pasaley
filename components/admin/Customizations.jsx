@@ -21,7 +21,6 @@ export default function Customizations() {
     }
   }, [session]);
 
-  // Fetch existing store settings from the server
   useEffect(() => {
     const fetchSettings = async () => {
       const response = await fetch('/api/store/settings');

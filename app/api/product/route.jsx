@@ -1,4 +1,3 @@
-// app/api/product/route.js
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 

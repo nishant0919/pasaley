@@ -7,8 +7,6 @@ export async function GET() {
   try {
     await connectDB();
 
-    // ❌ REMOVE session check for public GET
-    // Fetch the store settings
     const settings = await StoreSettings.findOne({});
     return new Response(JSON.stringify(settings || {}), { status: 200 });
   } catch (error) {
@@ -24,7 +22,6 @@ export async function POST(request) {
   try {
     await connectDB();
 
-    // ✅ Only check session when saving (POST)
     const session = await getServerSession(authOptions);
     if (!session) {
       return new Response(

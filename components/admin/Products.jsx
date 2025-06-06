@@ -81,7 +81,6 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto bg-gray-800 rounded-md shadow-lg">
         <table className="min-w-full">
           <thead>
@@ -116,7 +115,6 @@ export default function ProductsPage() {
         </table>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -196,7 +194,6 @@ export default function ProductsPage() {
                 onChange={handleImageChange}
                 className="w-full p-2 bg-gray-700 rounded-md"
               />
-              {/* Preview Images */}
               <div className="flex flex-wrap gap-2">
                 {formData.images.map((img, idx) => (
                   <img key={idx} src={img} className="h-16 w-16 object-cover rounded-md" />

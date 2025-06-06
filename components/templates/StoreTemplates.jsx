@@ -1,7 +1,6 @@
 import React from 'react';
 
 const StoreTemplate = ({ storeData }) => {
-  // Fallback if the data is missing or undefined
   const products = storeData.products || [];
   const socialLinks = storeData.socialLinks || [];
 

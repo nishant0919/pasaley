@@ -51,7 +51,6 @@ function OptionFile({ option }) {
 
   return (
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
-      {/* Mobile sidebar toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="md:hidden fixed top-4 left-4 z-30 bg-gray-700 p-2 rounded"
@@ -59,13 +58,10 @@ function OptionFile({ option }) {
         <FaBars />
       </button>
 
-      {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} />
 
-      {/* Divider */}
       <div className="hidden md:block w-px bg-gray-700" />
 
-      {/* Content */}
       <div className="flex-1 p-6 overflow-y-auto ml-0 md:ml-64">
         {renderComponent()}
       </div>

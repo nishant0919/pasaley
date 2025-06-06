@@ -5,14 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function AdminPanel() {
-  const { data: session, status } = useSession();  // Check session status
+  const { data: session, status } = useSession();  
   const router = useRouter();
 
-  // Redirect to login page if user is not authenticated
   useEffect(() => {
-    if (status === 'loading') return;  // Prevent checking before session is loaded
+    if (status === 'loading') return; 
     if (!session) {
-      router.push('/login');  // Redirect unauthenticated users to login page
+      router.push('/login');  
     }
   }, [session, status]);
 
@@ -23,7 +22,6 @@ export default function AdminPanel() {
   return (
     <div>
       <h1>Admin Panel</h1>
-      {/* Admin Panel content */}
     </div>
   );
 }

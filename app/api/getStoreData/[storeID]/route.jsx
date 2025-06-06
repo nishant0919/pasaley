@@ -2,16 +2,13 @@ import { connectDB } from '@/lib/mongodb';
 import Store from '@/models/Store';
 
 export async function GET(req, { params }) {
-  const { storeId } = params; // Get storeId from URL params
+  const { storeId } = params; 
 
-  // Connect to MongoDB
   await connectDB();
 
   try {
-    // Log the storeId to debug
     console.log('Received storeId:', storeId);
 
-    // Find the store by storeId in MongoDB (assuming 'storeId' is a field in the model)
     const store = await Store.findOne({ storeId }).exec();
 
     if (!store) {

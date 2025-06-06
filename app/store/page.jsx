@@ -55,7 +55,6 @@ export default async function StorePage() {
         fontFamily: settings.fontFamily || "Arial, sans-serif",
       }}
     >
-      {/* Logo and Store Name */}
       <div className="flex flex-col items-center mb-10">
         {settings.logoUrl && (
           <img
@@ -67,7 +66,6 @@ export default async function StorePage() {
         <h1 className="text-4xl font-bold">{settings.storeName}</h1>
       </div>
 
-      {/* Categories and Products */}
       <div className="w-full max-w-6xl">
         {categories.map((category) => (
           <div key={category._id} className="mb-12">
@@ -108,7 +106,6 @@ export default async function StorePage() {
         ))}
       </div>
 
-      {/* Footer */}
       <footer className="mt-16 text-sm text-gray-400">
         &copy; {new Date().getFullYear()} {settings.storeName || "My Store"} - All rights reserved.
       </footer>

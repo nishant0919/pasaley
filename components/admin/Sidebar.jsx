@@ -12,7 +12,6 @@ export default function AdminSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if mobile on mount and resize
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -23,7 +22,7 @@ export default function AdminSidebar() {
       }
     };
 
-    handleResize(); // Initial check
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -45,7 +44,6 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
       <button
         onClick={toggleSidebar}
         className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white"
@@ -53,17 +51,14 @@ export default function AdminSidebar() {
         {isSidebarOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Sidebar */}
       <aside
         className={`bg-gray-800 text-white h-screen fixed top-0 left-0 transition-all duration-300 z-40
           ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} 
           md:w-64 md:block`}
       >
         <div className="p-6 h-full flex flex-col">
-          {/* Sidebar Header */}
           <h2 className="text-2xl font-bold text-center mb-6">Admin</h2>
 
-          {/* User Info */}
           {session?.user && (
             <div className="flex items-center space-x-4 mb-6">
               <img
@@ -80,7 +75,6 @@ export default function AdminSidebar() {
 
           <hr className="border-gray-700 mb-4" />
 
-          {/* Sidebar Links */}
           <ul className="space-y-2 flex-1">
             {links.map((link) => (
               <li key={link.href}>
@@ -99,7 +93,6 @@ export default function AdminSidebar() {
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
       {isSidebarOpen && isMobile && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"

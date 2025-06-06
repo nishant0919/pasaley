@@ -41,7 +41,6 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto bg-gray-800 rounded-md shadow-lg">
         <table className="min-w-full">
           <thead>
@@ -69,7 +68,6 @@ export default function CategoriesPage() {
         </table>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <motion.div
           initial={{ opacity: 0 }}

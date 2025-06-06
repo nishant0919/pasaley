@@ -1,10 +1,9 @@
-// app/dashboard/products/page.jsx
 'use client';
 import { useState } from 'react';
 import ProductForm from '@/components/dashboard/ProductForm';
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]); // Fetch from API in real usage
+  const [products, setProducts] = useState([]);
 
   return (
     <div className="p-6">

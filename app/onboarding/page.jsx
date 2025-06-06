@@ -25,7 +25,6 @@ export default function OnboardingPage() {
     });
 
     if (res.ok) {
-      // After completing the profile, redirect to the admin panel
       router.push('/admin');
     }
   };

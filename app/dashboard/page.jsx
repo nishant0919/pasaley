@@ -14,9 +14,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (status === 'authenticated') {
       if (!session.user.isProfileComplete) {
-        router.push('/onboarding'); // Redirect to create a store if profile is incomplete
+        router.push('/onboarding'); 
       } else {
-        // Redirect to admin panel if profile is complete
         router.push('/admin');
       }
     }
@@ -26,5 +25,5 @@ export default function Dashboard() {
     return <p className="text-center p-4">Loading...</p>;
   }
 
-  return null; // This page will redirect to either onboarding or admin based on conditions
+  return null; 
 }
