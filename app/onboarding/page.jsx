@@ -11,6 +11,7 @@ export default function OnboardingPage() {
 
   const [storeName, setStoreName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
+  const [template, setTemplate] = useState('classic-grid');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function OnboardingPage() {
         email: session.user.email,
         storeName,
         contactNumber,
+        template,
       }),
     });
 
@@ -81,6 +83,17 @@ export default function OnboardingPage() {
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
             required
           />
+
+          <select
+            value={template}
+            onChange={(e) => setTemplate(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          >
+            <option value="classic-grid">Classic Grid</option>
+            <option value="modern-cards">Modern Cards</option>
+            <option value="minimalist">Minimalist</option>
+          </select>
+
           <button
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold py-3 rounded-md transition"

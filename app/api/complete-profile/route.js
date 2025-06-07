@@ -1,9 +1,8 @@
 import { connectDB } from '@/lib/mongodb';
 import { User } from '@/models/userSchema';
 
-
 export async function POST(req) {
-  const { email, storeName, contactNumber } = await req.json();
+  const { email, storeName, contactNumber, template } = await req.json();
   await connectDB();
 
   await User.findOneAndUpdate(
@@ -11,6 +10,7 @@ export async function POST(req) {
     {
       storeName,
       contactNumber,
+      template,
       isProfileComplete: true,
     }
   );

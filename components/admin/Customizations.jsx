@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { FaSave, FaPen, FaTimes } from 'react-icons/fa';
+import { FaSave, FaPen, FaTimes, FaUpload, FaTrash } from 'react-icons/fa';
+
+const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
 export default function AdminCustomization() {
   const [activeTab, setActiveTab] = useState('branding');
@@ -16,57 +18,69 @@ export default function AdminCustomization() {
 
   const [components, setComponents] = useState({
     topBarText: '',
-    navbarStyle: 'light',
+    navbarStyle: 'basic',
     footerStyle: 'dark',
     bodyStyle: 'default',
   });
 
-  // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalField, setModalField] = useState(null);
   const [modalValue, setModalValue] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Open modal for a field
   function openModal(field, type = 'branding') {
     setModalField({ field, type });
-    let val = '';
-    if (type === 'branding') val = branding[field];
-    else if (type === 'components') val = components[field];
+    const val = type === 'branding' ? branding[field] : components[field];
     setModalValue(val);
+    setPreviewImage(null);
     setModalOpen(true);
   }
 
-  // Save modal changes
   function saveModal() {
     if (modalField.type === 'branding') {
       setBranding((prev) => ({ ...prev, [modalField.field]: modalValue }));
-    } else if (modalField.type === 'components') {
+    } else {
       setComponents((prev) => ({ ...prev, [modalField.field]: modalValue }));
     }
-    setModalOpen(false);
-    setModalField(null);
+    closeModal();
   }
 
-  // Handle branding changes inline (for file inputs)
-  const handleFileChange = (e, target) => {
+  function closeModal() {
+    setModalOpen(false);
+    setModalField(null);
+    setPreviewImage(null);
+  }
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (target === 'logo') {
-          setBranding((prev) => ({ ...prev, brandLogo: reader.result }));
-        } else if (target === 'favicon') {
-          setBranding((prev) => ({ ...prev, brandFavicon: reader.result }));
-        }
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data?.data?.url) {
+        setModalValue(data.data.url);
+        setPreviewImage(data.data.url);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  // Modal input rendering based on field
   function renderModalInput() {
     if (!modalField) return null;
     const { field, type } = modalField;
+
+    const commonClasses = "w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-700 text-black dark:text-white";
 
     if (field === 'primaryColor') {
       return (
@@ -85,8 +99,7 @@ export default function AdminCustomization() {
         <select
           value={modalValue}
           onChange={(e) => setModalValue(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-          autoFocus
+          className={commonClasses}
         >
           <option value="Arial, sans-serif">Arial</option>
           <option value="'Times New Roman', serif">Times New Roman</option>
@@ -101,24 +114,33 @@ export default function AdminCustomization() {
       ['navbarStyle', 'footerStyle', 'bodyStyle'].includes(field) &&
       type === 'components'
     ) {
-      let options = [];
-      if (field === 'navbarStyle') {
-        options = ['light', 'dark', 'colored'];
-      } else if (field === 'footerStyle') {
-        options = ['light', 'dark', 'minimal'];
-      } else if (field === 'bodyStyle') {
-        options = ['default', 'boxed', 'wide'];
-      }
+      const options = {
+        navbarStyle: [
+          { value: 'centeredLogo', label: 'Navbar with Centered Logo' },
+          { value: 'withCategories', label: 'Navbar with Categories' },
+          { value: 'basic', label: 'Basic Navbar' },
+        ],
+        footerStyle: [
+          { value: 'light', label: 'Light' },
+          { value: 'dark', label: 'Dark' },
+          { value: 'minimal', label: 'Minimal' },
+        ],
+        bodyStyle: [
+          { value: 'default', label: 'Default' },
+          { value: 'boxed', label: 'Boxed' },
+          { value: 'wide', label: 'Wide' },
+        ],
+      }[field];
+
       return (
         <select
           value={modalValue}
           onChange={(e) => setModalValue(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-          autoFocus
+          className={commonClasses}
         >
           {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt.charAt(0).toUpperCase() + opt.slice(1)}
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>
@@ -127,35 +149,50 @@ export default function AdminCustomization() {
 
     if (['brandLogo', 'brandFavicon'].includes(field) && type === 'branding') {
       return (
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => setModalValue(reader.result);
-              reader.readAsDataURL(file);
-            }
-          }}
-          autoFocus
-        />
+        <div className="space-y-4">
+          {previewImage || modalValue ? (
+            <div className="relative w-24 h-24">
+              <img
+                src={previewImage || modalValue}
+                alt="preview"
+                className="w-full h-full object-contain border rounded"
+              />
+              <button
+                onClick={() => {
+                  setModalValue('');
+                  setPreviewImage(null);
+                }}
+                className="absolute -top-2 -right-2 bg-red-600 text-white p-1 rounded-full shadow"
+                type="button"
+              >
+                <FaTrash size={12} />
+              </button>
+            </div>
+          ) : null}
+          <label className="flex items-center gap-2 cursor-pointer text-blue-600 hover:underline">
+            <FaUpload />
+            <span>{isUploading ? 'Uploading...' : 'Add Image'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
+        </div>
       );
     }
 
-    // Default input is text
     return (
       <input
         type="text"
         value={modalValue}
         onChange={(e) => setModalValue(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded"
-        autoFocus
+        className={commonClasses}
       />
     );
   }
 
-  // Helper to display file image preview in form
   function renderImagePreview(field) {
     const url = branding[field];
     if (!url) return null;
@@ -176,244 +213,108 @@ export default function AdminCustomization() {
 
       {/* Tabs */}
       <div className="flex space-x-4 mb-8 border-b border-gray-300 dark:border-gray-700">
-        <button
-          onClick={() => setActiveTab('branding')}
-          className={`pb-2 font-semibold ${
-            activeTab === 'branding'
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 dark:text-gray-400'
-          }`}
-        >
-          Branding
-        </button>
-        <button
-          onClick={() => setActiveTab('components')}
-          className={`pb-2 font-semibold ${
-            activeTab === 'components'
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 dark:text-gray-400'
-          }`}
-        >
-          Components
-        </button>
+        {['branding', 'components'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`pb-2 font-semibold ${
+              activeTab === tab
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 dark:text-gray-400'
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          alert('Settings saved (demo)');
+          try {
+            const res = await fetch('/api/admin/customizations', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ branding, components }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('Settings saved successfully!');
+            } else {
+              alert('Error saving settings: ' + (data.error || 'Unknown error'));
+            }
+          } catch (err) {
+            console.error('Saving settings failed:', err);
+            alert('Server error while saving settings.');
+          }
         }}
-        className="max-w-full"
+        className="max-w-full space-y-4"
       >
         {activeTab === 'branding' && (
-          <div className="w-full border border-gray-300 dark:border-gray-700 rounded">
-            {/* Brand Name */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700 w-full">
-              <label
-                htmlFor="brandName"
-                className="font-semibold text-gray-900 dark:text-white"
-              >
-                Brand Name
-              </label>
-              <div className="flex items-center gap-4">
-                <span className="text-lg font-medium">
-                  {branding.brandName || (
-                    <span className="italic text-gray-500">Not set</span>
-                  )}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => openModal('brandName', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Brand Name"
-                >
-                  <FaPen />
-                </button>
+          <div className="border rounded border-gray-300 dark:border-gray-700 divide-y">
+            {[
+              ['Brand Name', 'brandName'],
+              ['Primary Color', 'primaryColor'],
+              ['Font Family', 'fontFamily'],
+              ['Brand Logo', 'brandLogo'],
+              ['Brand Favicon', 'brandFavicon'],
+              ['Currency', 'currency'],
+            ].map(([label, key]) => (
+              <div key={key} className="flex justify-between items-center p-4">
+                <label className="font-semibold">{label}</label>
+                <div className="flex items-center gap-4">
+                  {['brandLogo', 'brandFavicon'].includes(key)
+                    ? renderImagePreview(key) || (
+                        <span className="italic text-gray-500">Not set</span>
+                      )
+                    : branding[key] || (
+                        <span className="italic text-gray-500">Not set</span>
+                      )}
+                  <button
+                    type="button"
+                    onClick={() => openModal(key, 'branding')}
+                    className="p-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-900"
+                  >
+                    <FaPen />
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* Primary Color */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Primary Color
-              </label>
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-8 h-8 rounded border border-gray-400"
-                  style={{ backgroundColor: branding.primaryColor }}
-                />
-                <button
-                  type="button"
-                  onClick={() => openModal('primaryColor', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Primary Color"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Font Family */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Font Family
-              </label>
-              <div className="flex items-center gap-4">
-                <span>{branding.fontFamily}</span>
-                <button
-                  type="button"
-                  onClick={() => openModal('fontFamily', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Font Family"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Brand Logo */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Brand Logo
-              </label>
-              <div className="flex items-center gap-4">
-                {renderImagePreview('brandLogo') || (
-                  <span className="italic text-gray-500">Not set</span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => openModal('brandLogo', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Brand Logo"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Brand Favicon */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Brand Favicon
-              </label>
-              <div className="flex items-center gap-4">
-                {renderImagePreview('brandFavicon') || (
-                  <span className="italic text-gray-500">Not set</span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => openModal('brandFavicon', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Brand Favicon"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Currency */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Currency
-              </label>
-              <div className="flex items-center gap-4">
-                <span>{branding.currency}</span>
-                <button
-                  type="button"
-                  onClick={() => openModal('currency', 'branding')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Currency"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
         {activeTab === 'components' && (
-          <div className="w-full border border-gray-300 dark:border-gray-700 rounded">
-            {/* Top Bar Text */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Top Bar Text
-              </label>
-              <div className="flex items-center gap-4">
-                <span>
-                  {components.topBarText || (
-                    <span className="italic text-gray-500">Not set</span>
-                  )}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => openModal('topBarText', 'components')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Top Bar Text"
-                >
-                  <FaPen />
-                </button>
+          <div className="border rounded border-gray-300 dark:border-gray-700 divide-y">
+            {[
+              ['Top Bar Text', 'topBarText'],
+              ['Navbar Style', 'navbarStyle'],
+              ['Footer Style', 'footerStyle'],
+              ['Body Style', 'bodyStyle'],
+            ].map(([label, key]) => (
+              <div key={key} className="flex justify-between items-center p-4">
+                <label className="font-semibold">{label}</label>
+                <div className="flex items-center gap-4">
+                  <span className="capitalize">
+                    {components[key]?.replace(/([A-Z])/g, ' $1') || (
+                      <span className="italic text-gray-500">Not set</span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => openModal(key, 'components')}
+                    className="p-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-100 dark:hover:bg-blue-900"
+                  >
+                    <FaPen />
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* Navbar Style */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Navbar Style
-              </label>
-              <div className="flex items-center gap-4">
-                <span>{components.navbarStyle}</span>
-                <button
-                  type="button"
-                  onClick={() => openModal('navbarStyle', 'components')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Navbar Style"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Footer Style */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Footer Style
-              </label>
-              <div className="flex items-center gap-4">
-                <span>{components.footerStyle}</span>
-                <button
-                  type="button"
-                  onClick={() => openModal('footerStyle', 'components')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Footer Style"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
-
-            {/* Body Style */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-              <label className="font-semibold text-gray-900 dark:text-white">
-                Body Style
-              </label>
-              <div className="flex items-center gap-4">
-                <span>{components.bodyStyle}</span>
-                <button
-                  type="button"
-                  onClick={() => openModal('bodyStyle', 'components')}
-                  className="p-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 focus:outline-none"
-                  aria-label="Edit Body Style"
-                >
-                  <FaPen />
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
         <button
           type="submit"
-          className="mt-8 bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 focus:outline-none"
+          className="mt-4 bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700"
         >
           <FaSave className="inline mr-2" />
           Save Changes
@@ -422,37 +323,31 @@ export default function AdminCustomization() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded shadow-lg max-w-md w-full p-6 relative">
             <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-700 dark:text-gray-300 hover:text-red-600 focus:outline-none"
-              aria-label="Close Modal"
+              onClick={closeModal}
+              className="absolute top-3 right-3 text-gray-700 dark:text-gray-300 hover:text-red-600"
             >
               <FaTimes />
             </button>
 
-            <h2 className="text-xl font-bold mb-4">
-              Edit{' '}
-              {modalField
-                ? modalField.field
-                    .replace(/([A-Z])/g, ' $1')
-                    .replace(/^./, (str) => str.toUpperCase())
-                : ''}
+            <h2 className="text-xl font-bold mb-4 capitalize">
+              Edit {modalField?.field.replace(/([A-Z])/g, ' $1')}
             </h2>
 
             <div className="mb-4">{renderModalInput()}</div>
 
             <div className="flex justify-end gap-4">
               <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+                onClick={closeModal}
+                className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={saveModal}
-                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 focus:outline-none"
+                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
               >
                 Save
               </button>

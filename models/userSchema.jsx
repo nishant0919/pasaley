@@ -10,6 +10,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  template: {
+    type: String,
+    default: 'classic-grid', 
+  },
 });
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
