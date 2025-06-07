@@ -112,7 +112,9 @@ export default function ProductsPage() {
       const bodyData = {
         ...formData,
         sellingPrice: parseFloat(formData.sellingPrice),
-        crossedPrice: formData.crossedPrice ? parseFloat(formData.crossedPrice) : undefined,
+        crossedPrice: formData.crossedPrice
+          ? parseFloat(formData.crossedPrice)
+          : undefined,
         costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
         quantity: parseInt(formData.quantity),
       };
@@ -180,7 +182,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="p-4 sm:p-8 bg-gray-900 min-h-screen text-white">
+    <div className="p-4 sm:p-8 min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold">Products</h1>
         <button
@@ -199,7 +201,7 @@ export default function ProductsPage() {
             });
             setShowModal(true);
           }}
-          className="bg-blue-600 px-6 py-2 rounded-md hover:bg-blue-700 w-full sm:w-auto"
+          className="bg-blue-600 px-6 py-2 rounded-md hover:bg-blue-700 w-full sm:w-auto text-white"
         >
           + Add New Product
         </button>
@@ -208,14 +210,14 @@ export default function ProductsPage() {
       {loading ? (
         <Loading />
       ) : products.length === 0 ? (
-        <div className="text-center py-10 text-gray-400 text-lg">
+        <div className="text-center py-10 text-gray-500 dark:text-gray-400 text-lg">
           No products available.
         </div>
       ) : (
-        <div className="overflow-x-auto bg-gray-800 rounded-md shadow-lg">
+        <div className="overflow-x-auto bg-gray-100 dark:bg-gray-800 rounded-md shadow-lg">
           <table className="min-w-full table-auto border-collapse">
             <thead>
-              <tr className="text-left text-gray-400 border-b border-gray-700">
+              <tr className="text-left text-gray-700 dark:text-gray-300 border-b border-gray-300 dark:border-gray-700">
                 <th className="p-4 min-w-[70px]">Image</th>
                 <th className="p-4 min-w-[150px]">Name</th>
                 <th className="p-4 min-w-[120px]">Category</th>
@@ -229,7 +231,7 @@ export default function ProductsPage() {
               {products.map((product) => (
                 <tr
                   key={product._id}
-                  className="border-t border-gray-700 hover:bg-gray-700 transition"
+                  className="border-t border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                 >
                   <td className="p-4">
                     <img
@@ -248,7 +250,7 @@ export default function ProductsPage() {
                   <td className="p-4 flex gap-3">
                     <button
                       onClick={() => handleEdit(product)}
-                      className="flex items-center gap-1 text-blue-400 hover:text-blue-600"
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
                       aria-label="Edit product"
                     >
                       <Edit3 size={16} />
@@ -256,7 +258,7 @@ export default function ProductsPage() {
                     </button>
                     <button
                       onClick={() => handleDelete(product._id)}
-                      className="flex items-center gap-1 text-red-400 hover:text-red-600"
+                      className="flex items-center gap-1 text-red-600 hover:text-red-800"
                       aria-label="Delete product"
                     >
                       <Trash2 size={16} />
@@ -281,7 +283,7 @@ export default function ProductsPage() {
             initial={{ scale: 0.85 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.85 }}
-            className="bg-gray-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative shadow-lg"
+            className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative shadow-lg"
           >
             <button
               aria-label="Close modal"
@@ -289,12 +291,12 @@ export default function ProductsPage() {
                 setShowModal(false);
                 setEditingProduct(null);
               }}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-200"
+              className="absolute top-3 right-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
               <X size={24} />
             </button>
 
-            <h2 className="text-2xl font-bold mb-4">
+            <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
               {editingProduct ? "Edit Product" : "Add Product"}
             </h2>
 
@@ -303,64 +305,85 @@ export default function ProductsPage() {
                 type="text"
                 placeholder="Product Name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
                 required
               />
+
               <textarea
                 placeholder="Description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                rows={3}
+                className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white resize-none"
               />
-              <input
-                type="number"
-                placeholder="Selling Price (required)"
-                value={formData.sellingPrice}
-                onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
-                required
-                min="0"
-                step="0.01"
-              />
-              <input
-                type="number"
-                placeholder="Crossed Price (optional)"
-                value={formData.crossedPrice}
-                onChange={(e) => setFormData({ ...formData, crossedPrice: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
-                min="0"
-                step="0.01"
-              />
-              <input
-                type="number"
-                placeholder="Cost Price (optional)"
-                value={formData.costPrice}
-                onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
-                min="0"
-                step="0.01"
-              />
-              <input
-                type="number"
-                placeholder="Quantity"
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
-                min="0"
-                step="1"
-              />
-              <input
-                type="text"
-                placeholder="Weight (e.g., 500g)"
-                value={formData.weight}
-                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
-              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Selling Price"
+                  value={formData.sellingPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, sellingPrice: e.target.value })
+                  }
+                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
+                  required
+                />
+
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Crossed Price"
+                  value={formData.crossedPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, crossedPrice: e.target.value })
+                  }
+                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Cost Price"
+                  value={formData.costPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, costPrice: e.target.value })
+                  }
+                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Quantity"
+                  value={formData.quantity}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quantity: e.target.value })
+                  }
+                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
+                />
+                <input
+                  type="text"
+                  placeholder="Weight (e.g. 500g)"
+                  value={formData.weight}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weight: e.target.value })
+                  }
+                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
+                />
+              </div>
+
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full p-2 bg-gray-700 rounded-md"
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
+                className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-black dark:text-white"
                 required
               >
                 <option value="">Select Category</option>
@@ -371,40 +394,51 @@ export default function ProductsPage() {
                 ))}
               </select>
 
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full p-2 bg-gray-700 rounded-md"
-              />
-
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formData.images.map((img, idx) => (
-                  <div key={idx} className="relative">
-                    <img
-                      src={img}
-                      alt={`Preview ${idx + 1}`}
-                      className="h-16 w-16 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImageAtIndex(idx)}
-                      className="absolute top-0 right-0 bg-black bg-opacity-50 rounded-full p-1 text-white hover:bg-red-600 transition"
-                      aria-label={`Remove image ${idx + 1}`}
+              <div>
+                <label
+                  htmlFor="imageUpload"
+                  className="cursor-pointer inline-block mb-2 text-blue-600 hover:text-blue-800"
+                >
+                  + Add Images
+                </label>
+                <input
+                  id="imageUpload"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <div className="flex flex-wrap gap-3 mt-2 max-h-36 overflow-auto">
+                  {formData.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="relative w-20 h-20 rounded-md overflow-hidden"
                     >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
+                      <img
+                        src={img}
+                        alt={`Preview ${idx + 1}`}
+                        className="object-cover w-full h-full"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImageAtIndex(idx)}
+                        className="absolute top-1 right-1 bg-black bg-opacity-50 rounded-full p-1 text-white hover:bg-opacity-80"
+                        aria-label="Remove image"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-green-500 py-2 rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Saving..." : "Save Product"}
+                {loading ? "Saving..." : editingProduct ? "Update Product" : "Save Product"}
               </button>
             </form>
           </motion.div>
