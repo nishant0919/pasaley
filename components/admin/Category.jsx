@@ -12,7 +12,6 @@ export default function CategoriesPage() {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(null);
 
-  // Disable body scroll when modal open
   useEffect(() => {
     if (showModal) {
       document.body.style.overflow = "hidden";
@@ -83,22 +82,22 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="p-4 sm:p-8 bg-[#111827] min-h-screen text-white">
+    <div className="p-4 sm:p-8 min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Categories</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 px-5 py-2 rounded-md hover:bg-blue-700 transition text-sm sm:text-base w-full sm:w-auto text-center"
+          className="bg-blue-600 px-5 py-2 rounded-md hover:bg-blue-700 transition text-sm sm:text-base w-full sm:w-auto text-center text-white"
         >
           + Add Category
         </button>
       </div>
 
       {/* Responsive Table Wrapper */}
-      <div className="overflow-x-auto bg-[#1f2937] rounded-md shadow-lg">
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-md shadow-lg transition-colors duration-300">
         <table className="min-w-full border-collapse table-auto">
           <thead>
-            <tr className="text-left text-gray-400 border-b border-gray-700">
+            <tr className="text-left text-gray-600 dark:text-gray-400 border-b border-gray-300 dark:border-gray-700">
               <th className="p-3 sm:p-4 min-w-[64px]">Image</th>
               <th className="p-3 sm:p-4 min-w-[120px]">Name</th>
               <th className="p-3 sm:p-4 min-w-[120px]">Created At</th>
@@ -109,13 +108,13 @@ export default function CategoriesPage() {
             {categories.map((cat) => (
               <tr
                 key={cat._id}
-                className="border-t border-gray-700 hover:bg-gray-800 transition"
+                className="border-t border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               >
                 <td className="p-2 sm:p-4">
                   <img
                     src={cat.imageUrl}
                     alt="category"
-                    className="h-10 w-10 sm:h-12 sm:w-12 rounded-md object-cover border border-gray-600"
+                    className="h-10 w-10 sm:h-12 sm:w-12 rounded-md object-cover border border-gray-300 dark:border-gray-600"
                   />
                 </td>
                 <td className="p-2 sm:p-4 text-sm sm:text-base">{cat.name}</td>
@@ -125,7 +124,7 @@ export default function CategoriesPage() {
                 <td className="p-2 sm:p-4">
                   <button
                     onClick={() => handleDelete(cat._id)}
-                    className="text-red-400 hover:text-red-600 flex items-center gap-1 text-sm sm:text-base"
+                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600 flex items-center gap-1 text-sm sm:text-base transition"
                   >
                     <Trash2 size={16} />
                     Delete
@@ -144,17 +143,19 @@ export default function CategoriesPage() {
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4"
         >
-          <div className="relative bg-[#1f2937] p-6 rounded-lg w-full max-w-md mx-auto">
+          <div className="relative bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md mx-auto transition-colors duration-300">
             {/* Close Modal */}
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white transition"
+              className="absolute top-3 right-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
               aria-label="Close modal"
             >
               <X size={24} />
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 text-white">Add Category</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              Add Category
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
@@ -163,7 +164,7 @@ export default function CategoriesPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, name: e.target.value }))
                 }
-                className="w-full p-2 bg-gray-700 rounded-md text-white placeholder-gray-400"
+                className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
 
@@ -172,17 +173,17 @@ export default function CategoriesPage() {
                   type="file"
                   accept="image/*"
                   onChange={handleUploadImage}
-                  className="w-full p-2 bg-gray-700 rounded-md text-white cursor-pointer file:mr-3 file:py-1 file:px-2 file:border-none file:bg-blue-600 file:text-white"
+                  className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-900 dark:text-white cursor-pointer file:mr-3 file:py-1 file:px-2 file:border-none file:bg-blue-600 file:text-white"
                   required
                 />
               )}
 
               {uploading && (
-                <p className="text-sm text-gray-400">Uploading image...</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Uploading image...</p>
               )}
 
               {preview && (
-                <div className="relative w-full h-40 rounded-md overflow-hidden border border-gray-600">
+                <div className="relative w-full h-40 rounded-md overflow-hidden border border-gray-300 dark:border-gray-600">
                   <img
                     src={preview}
                     alt="Preview"
@@ -202,7 +203,7 @@ export default function CategoriesPage() {
               <button
                 type="submit"
                 disabled={uploading || !formData.name || !formData.imageUrl}
-                className="w-full bg-green-500 py-2 rounded-md hover:bg-green-600 transition disabled:opacity-50"
+                className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 py-2 rounded-md transition disabled:opacity-50 text-white"
               >
                 Save Category
               </button>

@@ -3,7 +3,7 @@ import React from "react";
 
 function layout({ children }) {
   return (
-    <div className="w-full min-h-screen bg-gray-900 text-white">
+    <div className="w-full min-h-screen text-white">
       <Sidebar />
       <div className="pl-[20vw] p-6">
         {children}

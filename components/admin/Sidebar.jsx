@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import {
-  FaHome, FaStore, FaUsers, FaTags, FaBox, FaUserAlt,
+  FaHome, FaUsers, FaTags, FaBox, FaUserAlt,
   FaShoppingCart, FaChartLine, FaCog, FaBars, FaTimes
 } from 'react-icons/fa';
 import ThemeToggle from '../ThemeToggle';
@@ -18,13 +18,16 @@ export default function AdminSidebar() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsSidebarOpen(window.innerWidth >= 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setIsSidebarOpen(!mobile);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const links = [
     { href: '/admin/home', label: 'Home', icon: <FaHome /> },
@@ -37,71 +40,90 @@ export default function AdminSidebar() {
     { href: '/admin/customizations', label: 'Customizations', icon: <FaCog /> },
   ];
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-200 dark:bg-gray-800 rounded-md text-gray-900 dark:text-white shadow-md"
+        aria-label="Toggle Sidebar"
       >
         {isSidebarOpen ? <FaTimes /> : <FaBars />}
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`bg-gray-800 text-white h-screen fixed top-0 left-0 transition-all duration-300 z-40
-          ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} 
-          md:w-64 md:block`}
+        className={`fixed top-0 left-0 h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white transition-all duration-300 z-40
+        ${isSidebarOpen ? 'w-64' : 'w-16'} md:block`}
       >
-        <div className="p-6 h-full flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-center mb-4">Admin Panel</h2>
+        <div className="h-full flex flex-col p-4 overflow-hidden">
+          {/* Header */}
+          <h2 className={`text-xl font-bold text-center mb-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            Admin Panel
+          </h2>
 
           {/* User Info */}
           {session?.user && (
-            <div className="flex items-center gap-4 p-3 rounded-lg border border-gray-700">
+            <div className={`flex items-center gap-3 p-3 mb-4 rounded transition-all duration-300
+              ${isSidebarOpen ? 'flex bg-gray-300 dark:bg-gray-700' : 'flex-col items-center bg-gray-300 dark:bg-gray-700'}`}>
               <img
                 src={session.user.image || '/default-profile.jpg'}
                 alt="User Avatar"
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover border border-gray-400 dark:border-gray-600"
               />
-              <div>
-                <p className="font-semibold truncate">{session.user.name}</p>
-                <p className="text-sm text-gray-400 truncate">{session.user.email}</p>
-              </div>
+              {isSidebarOpen && (
+                <div className="overflow-hidden">
+                  <p className="font-semibold truncate">{session.user.name}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{session.user.email}</p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Nav Links */}
+          {/* Navigation Links */}
           <ul className="space-y-2 flex-1 overflow-y-auto">
-            {links.map((link) => (
+            {links.map(link => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`flex items-center gap-3 px-4 py-2 rounded-md transition 
-                    ${pathname === link.href ? 'bg-gray-700 font-semibold' : 'hover:bg-gray-700'}`}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md transition
+                    ${pathname === link.href ? 'bg-gray-400 dark:bg-gray-700 font-semibold' : 'hover:bg-gray-300 dark:hover:bg-gray-700'}
+                    ${isSidebarOpen ? 'justify-start' : 'justify-center'}
+                    text-gray-900 dark:text-gray-100`}
                   onClick={() => isMobile && setIsSidebarOpen(false)}
                 >
                   <span className="text-lg">{link.icon}</span>
-                  <span className="truncate">{link.label}</span>
+                  {isSidebarOpen && <span className="truncate">{link.label}</span>}
                 </Link>
               </li>
             ))}
           </ul>
 
-          {/* Theme Toggle Button */}
-          <div className="pt-4 border-t border-gray-700">
-            <ThemeToggle />
+          {/* Footer Section */}
+          <div className={`pt-4 border-t border-gray-400 dark:border-gray-700 mt-4 flex flex-col gap-2 
+            ${isSidebarOpen ? 'items-start' : 'items-center'}`}>
+            <ThemeToggle collapsed={!isSidebarOpen} />
+            <button
+              onClick={() => signOut()}
+              className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 w-full justify-center md:justify-start text-sm font-medium"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7" />
+              </svg>
+              {isSidebarOpen && 'Sign Out'}
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* Backdrop for Mobile */}
+      {/* Mobile Overlay */}
       {isSidebarOpen && isMobile && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={toggleSidebar}
+          aria-hidden="true"
         />
       )}
     </>
