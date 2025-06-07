@@ -13,3 +13,10 @@ export async function POST(request) {
   const category = await Category.create({ name, imageUrl });
   return Response.json(category);
 }
+
+export async function DELETE(request) {
+  await connectDB();
+  const { id } = await request.json();
+  await Category.findByIdAndDelete(id);
+  return Response.json({ message: "Category deleted" });
+}

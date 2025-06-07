@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.9.0",
-    "framer-motion": "^12.9.2",
+    "framer-motion": "^12.16.0",
     "link": "^2.1.1",
+    "lucide-react": "^0.513.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.13.2",
     "next": "14.2.28",

@@ -1,5 +1,6 @@
 'use client';
 
+import LoadingScreen from '@/components/LoadingScreen';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -16,12 +17,10 @@ export default function AdminPanel() {
   }, [session, status]);
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <div><LoadingScreen/></div>;
   }
 
   return (
-    <div>
-      <h1>Admin Panel</h1>
-    </div>
+    router.push('/admin/home')
   );
 }

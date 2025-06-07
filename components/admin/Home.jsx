@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
+import LoadingScreen from '../LoadingScreen';
 
 export default function AdminHome() {
   const { data: session, status } = useSession();
@@ -21,9 +22,7 @@ export default function AdminHome() {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-        <p>Loading...</p>
-      </div>
+      <LoadingScreen/>
     );
   }
 
